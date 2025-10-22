@@ -30,6 +30,7 @@ extra["springModulithVersion"] = "1.4.1"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.modulith:spring-modulith-starter-core")
@@ -52,6 +53,34 @@ kotlin {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
+
+// GraalVM Native Image configuration
+// Provides the `nativeCompile` and `nativeTest` tasks and configures resource autodetection
+// Usage examples:
+//  - ./gradlew nativeCompile
+//  - ./gradlew bootBuildImage (builds a container) – uses BP_NATIVE_IMAGE=true
+
+graalvmNative {
+    toolchainDetection.set(true)
+    binaries {
+        named("main") {
+            imageName.set("${project.name}")
+            resources.autodetect()
+        }
+    }
+}
+
+// Configure bootBuildImage to build a native container image via Paketo buildpacks
+// Run: ./gradlew bootBuildImage
+// Resulting image name: projectName:version
+// Requires Docker/Podman running
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("bootBuildImage") {
+    imageName.set("${project.name}:${project.version}")
+    builder.set("paketobuildpacks/builder-jammy-tiny")
+    environment.set(mapOf("BP_NATIVE_IMAGE" to "true"))
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
