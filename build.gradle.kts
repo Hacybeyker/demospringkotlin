@@ -16,39 +16,23 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
 
 repositories {
     mavenCentral()
 }
 
-extra["springModulithVersion"] = "1.4.1"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework.modulith:spring-modulith-starter-core")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.modulith:spring-modulith-bom:${property("springModulithVersion")}")
-    }
-}
 
 kotlin {
+    //jvmToolchain(21)
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
@@ -85,3 +69,10 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("boot
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+/*
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+}*/
